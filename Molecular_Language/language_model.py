@@ -9,7 +9,7 @@ from disentangled_attention import DisentangledSelfAttention,build_relative_posi
 from torch.nn import LayerNorm
 from collections.abc import Sequence
 class BertSelfOutput(nn.Module):
-    def __init__(self,hidden_size,layer_norm_eps,hidden_dropout_prob):#官方设置的 hidden_size:768 layer_norm_eps:1e-7 hidden_dropout_prob
+    def __init__(self,hidden_size,layer_norm_eps,hidden_dropout_prob):
         super().__init__()
         self.dense=nn.Linear(hidden_size,hidden_size)
         self.LayerNorm=nn.LayerNorm(hidden_size,layer_norm_eps)
@@ -22,7 +22,6 @@ class BertSelfOutput(nn.Module):
         return hidden_states
 
 class BertAttention(nn.Module):
-    #这个是默认设置 后面可以稍微调一下 弄成轻量级的参数
     #num_attention_heads: 12 hidden_size: 768 hidden_dropout_prob:0.1 attention_probs_dropout_prob:0.1 layer_norm_eps:1e-7
     def __init__(self,num_attention_heads,hidden_size,hidden_dropout_prob,attention_probs_dropout_prob,layer_norm_eps):
         super().__init__()
@@ -39,7 +38,7 @@ class BertAttention(nn.Module):
         else:
             return attention_output
 
-class BertIntermediate(nn.Module):#这里相当于进入了一层MLP层，激活函数用的GeLU
+class BertIntermediate(nn.Module):
     def __init__(self,hidden_size,intermediate_size):
         super().__init__()
         self.dense = nn.Linear(hidden_size,intermediate_size)
@@ -70,10 +69,6 @@ class BertLayer(nn.Module):
         self.output=BertOutput(hidden_size,intermediate_size,layer_norm_eps,hidden_dropout_prob)
     def forward(self,hidden_states,attention_mask,return_att=False,query_states=None,relative_pos=None,rel_embeddings=None):
         attention_output=self.attention(hidden_states,attention_mask,return_att=return_att,query_states=query_states,relative_pos=relative_pos,rel_embeddings=rel_embeddings)
-        #进入Disengtangled_attention后出来
-        #进入intermediate中
-        #这个intermediate也就是一个Linear(hidden_size,intermediate_size),然后进入GeLU
-        #之后再进入Output中，Linear(intermediate,hidden_size),dropout,这个中间输入再和Attention_output相加，
         if return_att:
             attention_output,att_matrix=attention_output
         intermediate_output=self.intermediate(attention_output)
@@ -83,8 +78,7 @@ class BertLayer(nn.Module):
         else:
             return layer_output
 
-class ConVLayer(nn.Module):#这个用个卷积来增加局部建模能力
-    #给的配置是 conv_kernel_size=3, conv_groups=1 conv_act=gelu
+class ConVLayer(nn.Module):
     def __init__(self,hidden_size,layer_norm_eps,hidden_dropout_prob):
         super().__init__()
         kernel_size=3
@@ -102,7 +96,6 @@ class ConVLayer(nn.Module):#这个用个卷积来增加局部建模能力
         return output_states
 
 class BertEncoder(nn.Module):
-    #默认的num_hidden_layers=12 可以稍微调少点
     def __init__(self,num_hidden_layers,hidden_size,intermediate_size,layer_norm_eps,hidden_dropout_prob,num_attention_heads,attention_probs_dropout_prob):
         super().__init__()
         self.layer=nn.ModuleList([BertLayer(hidden_size,intermediate_size,layer_norm_eps,hidden_dropout_prob,num_attention_heads,attention_probs_dropout_prob) for _ in range(num_hidden_layers)])
@@ -177,8 +170,6 @@ class BertEncoder(nn.Module):
             'hidden_states': all_encoder_layers,
             'attention_matrices': att_matrices
         }
-#这里要拿最终的输出后的结果就是直接  outputs = encoder(hidden_states, attention_mask) final_hidden = outputs['hidden_states'][-1]   # 这才是多层 DeBERTa 编码后的最终表示
-
 class BertEmbeddings(nn.Module):
     #vocal_size:128100  hidden_size:768 max_position_embeddings:512 type_vocal_size:0 layer_norm_eps:1e-7
     def __init__(self,hidden_size,vocab_size,max_position_embeddings,type_vocal_size,layer_norm_eps,hidden_dropout_prob):
@@ -214,12 +205,10 @@ class BertEmbeddings(nn.Module):
         return {
             'embeddings': embeddings,
             'position_embeddings': position_embeddings}
-
 class DeBERTa(torch.nn.Module):
     def __init__(self,hidden_size,vocab_size,max_position_embeddings,type_vocal_size,layer_norm_eps,hidden_dropout_prob,num_hidden_layers,intermediate_size,num_attention_heads,attention_probs_dropout_prob):
         super().__init__()
-        #这个encoder是进入注意力层里面的
-        #embedding是进入前的
+
         self.embeddings=BertEmbeddings(hidden_size,vocab_size,max_position_embeddings,type_vocal_size,layer_norm_eps,hidden_dropout_prob)
         self.encoder=BertEncoder(num_hidden_layers,hidden_size,intermediate_size,layer_norm_eps,hidden_dropout_prob,num_attention_heads,attention_probs_dropout_prob)
     def forward(self,input_ids,attention_mask=None,token_type_ids=None,output_all_encoded_layers=True,position_ids=None,return_att=False):
@@ -256,6 +245,3 @@ class Pretrain_DeBERTa(torch.nn.Module):
         sent=masked_mean_pooling(last_hidden_states,attention_mask)
         proj=self.MLPHead(sent)
         return proj,sent
-
-#要取最后一层的输出就是 last_hidden = encoder_output['hidden_states'][-1] shape为：[batch_size,seq_len,hidden_size]
-#还要注意要池化操作
