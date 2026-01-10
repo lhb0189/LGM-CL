@@ -9,7 +9,7 @@ from transformers import AutoTokenizer
 import os
 from train import training
 
-Model_Name="deberta-v3-base"
+Model_Name="Molecular_Language/deberta-v3-base"
 tokenizer=AutoTokenizer.from_pretrained(Model_Name,use_fast=False,local_files_only=True)
 
 log_path="Finetune/log"
@@ -105,3 +105,4 @@ for seed in seed_list:
     mkdir(Save_path_seed)
 
     fold_score=training(log,dataset_path,text_path,dataset_type,seed,val_path,test_path,split,split_type,metric,Model,tokenizer,Save_path_seed,batch_size,init_lr,total_epochs,task_name)
+
