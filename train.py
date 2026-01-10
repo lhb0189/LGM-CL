@@ -145,12 +145,12 @@ def training(log,dataset_path,text_path,dataset_type,seed,val_path,test_path,spl
         test_data = load_data(test_path)
     elif val_path != None:
         split_ratio = (split[0], 0, split[2])
-        train_data, _, test_data = split_data(dataset, split_type, split_ratio, seed)
+        train_data, _, test_data = split_data(dataset, split_type, split_ratio, seed,log)
     elif test_path != None:
         split_ratio = (split[0], split[1], 0)
-        train_data, val_data, _ = split_data(dataset, split_type, split_ratio, seed)
+        train_data, val_data, _ = split_data(dataset, split_type, split_ratio, seed,log)
     else:
-        train_data, val_data, test_data = split_data(dataset, split_type, split, seed)
+        train_data, val_data, test_data = split_data(dataset, split_type, split, seed,log)
     debug(
         f'Dataset size: {len(dataset)}    Train size: {len(train_data)}    Val size: {len(val_data)}    Test size: {len(test_data)}')  # 输出三种数据集的数量
     if dataset_type=="regression":
@@ -211,4 +211,5 @@ def training(log,dataset_path,text_path,dataset_type,seed,val_path,test_path,spl
     if task_num>1:
         for one_name,one_score in zip(task_name,test_score):
             info(f'task {one_name}{metric}={one_score:.6f}')
+
     return test_score
