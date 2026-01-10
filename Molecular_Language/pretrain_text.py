@@ -26,7 +26,7 @@ texts_data=texts_df["text"].tolist()
 
 Datasets=SmilesTextDataset(smiles_data,texts_data)
 
-def collate_fn_contrastive(batch,max_len=256):#这个batch是上面的Dataset类型的
+def collate_fn_contrastive(batch,max_len=256):
     smiles = [x["smiles"] for x in batch]
     text   = [x["text"] for x in batch]
     smiles_tok = tokenizer(smiles, padding=True, truncation=True, max_length=max_len, return_tensors="pt")
@@ -67,3 +67,4 @@ for epoch in range(1,epochs+1):
     train_loss=train_one_epoch(model,batch_size,dataloader,optimizer,temperature,device)
     info(f"Average Train Loss:{train_loss}")
     torch.save(model.state_dict(),"Save_DeBERTa_model/"+str(epoch)+"_encoder"+".pkl")
+
