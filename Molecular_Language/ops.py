@@ -16,7 +16,7 @@ class XSoftmax(torch.autograd.Function):
         self.save_for_backward(output)
         return output
     @staticmethod
-    def backward(self,grad_output):#这里由于torch新版本那个库不外放了，这个地方改了原代码
+    def backward(self,grad_output):
         output, = self.saved_tensors
         dim = self.dim
         grad_output=grad_output.contiguous()
@@ -41,26 +41,21 @@ class DropoutContext(object):
         self.scale=1
         self.reuse_mask=True
 def get_mask(input,local_context):
-    #当 local_context 不是DropoutContext的时候， 这里也不知道他源代码这个地方的不是的时候觉得会输入啥东西
     if not isinstance(local_context,DropoutContext):
         dropout=float(local_context)
         mask=None
-    #这里如果是的话，就是首先得到的Dropout概率
     else:
         dropout = local_context.dropout
-        dropout = dropout * local_context.scale #这里乘以一个Scale来动态调整实际的Dropout比例子
+        dropout = dropout * local_context.scale
         mask = local_context.mask if local_context.reuse_mask else None
     if dropout > 0 and mask is None:
         keep = torch.empty_like(input).bernoulli_(1 - dropout).to(torch.bool)
-        mask = ~keep  # True 表示丢弃
+        mask = ~keep  
     if isinstance(local_context,DropoutContext):
         if local_context.mask is None:
             local_context.mask=mask
-    #mask:None或者一个和input形状一样的布尔张量，表示那些位置被丢弃
-    #Dropout：使用的Dropout概率
     return mask,dropout
 
-#这里这个XDropout就是一个nn.Dropout的一个增强版,前向和反向都用的同一个mask来掩藏信息以对某些神经元进行隐藏来减少过拟合，
 class XDropout(torch.autograd.Function):
     @staticmethod
     def forward(ctx,input,local_ctx):
@@ -111,18 +106,15 @@ class StableDropout(torch.nn.Module):
             return self.drop_prob
 
 def MaskedLayerNorm(layerNorm, x, mask=None):
-    # layerNorm: nn.LayerNorm 实例
     y = layerNorm(x)
     if mask is None:
         return y
-    # mask 预期 [B, S]；如果传成 [B,1,S,S] 之类，尽量压回 [B,S]
     if mask.dim() == 4:
-        # 常见 attention mask: [B,1,S,S] -> 取对角线/或 squeeze 后再取任意一维
-        mask = mask.squeeze(1).squeeze(1)  # 可能变成 [B,S,S] 或 [B,S]
+        mask = mask.squeeze(1).squeeze(1) 
         if mask.dim() == 3:
-            # 退而求其次：用任意一行判断 token 是否有效
             mask = (mask.sum(-1) > 0)
     if mask.dim() == 2:
         mask = mask.unsqueeze(-1)          # [B,S,1]
     mask = mask.to(dtype=y.dtype)
     return y * mask
+
