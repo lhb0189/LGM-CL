@@ -1,4 +1,3 @@
-#这里将放入LLaMa3-8b的这个大模型
 import torch
 from transformers import AutoModelForCausalLM,AutoTokenizer
 import transformers
@@ -28,7 +27,7 @@ class LoraMistralModel(nn.Module):
             for param in self.peft_model.parameters():
                 param.requires_grad=False
     def template_generate(self,prompts,max_new_tokens,temperature,top_p):
-        self.peft_model.eval()#评估状态
+        self.peft_model.eval()
         single_input = isinstance(prompts, str)
         if single_input:
             prompt_list = [prompts]
@@ -62,5 +61,5 @@ class LoraMistralModel(nn.Module):
             new_texts.append(new_part.strip())
         result = new_texts[0] if single_input else new_texts
         return result
-    def forward(self, prompt, **generate_kwargs):#这里forward感觉不写都行，主要是用来生成文本
+    def forward(self, prompt, **generate_kwargs):
         return self.template_generate(prompt, **generate_kwargs)
