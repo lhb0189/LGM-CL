@@ -22,12 +22,10 @@ def set_log(name, save_path):
     log.setLevel(logging.DEBUG)
     if not log.handlers:
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        # 控制台输出
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
         console_handler.setFormatter(formatter)
         log.addHandler(console_handler)
-        # 文件输出
         os.makedirs(save_path, exist_ok=True)
         file_handler = logging.FileHandler(os.path.join(save_path, 'debug.log'))
         file_handler.setLevel(logging.DEBUG)
