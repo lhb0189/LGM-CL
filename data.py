@@ -12,10 +12,10 @@ class MoleData():
     def change_label(self,label):
         self.label=label
 
-class MoleDataSet(Dataset):#MoleDataset中,初始化中的参数类得是MoleData类
+class MoleDataSet(Dataset):
     def __init__(self,data):
         self.data=data
-        self.scaler=None #这里确定有没有对回归中的标签进行标准化操作
+        self.scaler=None 
     def __len__(self):
         return len(self.data)
     def __getitem__(self, key):
@@ -43,10 +43,11 @@ class MoleDataSet(Dataset):#MoleDataset中,初始化中的参数类得是MoleDat
     def task_num(self):
         if len(self.data)>0:
             return self.data[0].task_num()
-    def random_data(self,seed):#随机打乱数据
+    def random_data(self,seed):
         random.seed(seed)
         random.shuffle(self.data)
-    def change_label(self, label):  # 这里是用在多任务回归上,要将lable标准化，因此要更改标签
+    def change_label(self, label):
         assert len(self.data) == len(label)
         for i in range(len(label)):
-            self.data[i].change_label(label[i])  # 批量修改整个数据集中所有数据点的标签,例如数据预处理或者标准化
+            self.data[i].change_label(label[i])
+
