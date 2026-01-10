@@ -59,11 +59,11 @@ text_hidden_dim=256
 Graph_hidden_dim=256
 Final_hidden_dim=256
 #dataset parameter
-task_num=1# 任务数量
-save_path="Finetune\\Save_model\\Bace_model"#存储model.pt的路径
-dataset_path="Process_Datasets\\bace.csv"#数据集路径
-text_path="Process_Text_Datasets\\bace_text.csv"#增强文本路径
-dataset_type="classification" #任务类型，"classification" or "regression"
+task_num=1
+save_path="Finetune\\Save_model\\Bace_model"
+dataset_path="Process_Datasets\\bace.csv" 
+text_path="Process_Text_Datasets\\bace_text.csv"
+dataset_type="classification" #"classification" or "regression"
 val_path=None
 test_path=None
 split=[0.6,0.2,0.2]
@@ -71,10 +71,10 @@ split_type="random"
 init_lr=1e-3
 batch_size=64
 total_epochs=50
-task_name=["1"]#任务数量
+task_name=["1"]
 is_class_if=1# regression:0 classification:1
 metric="auc"#"rmse or auc"
-seed_list=[1,2]
+seed_list=[0,1,2]
 
 for seed in seed_list:
     torch.manual_seed(seed)
@@ -82,14 +82,14 @@ for seed in seed_list:
     random.seed(seed)
     Graph_Transformer = GT(output_features, d_atom, N, h, d_model, dropout_attn, leaky_relu_slope, dropout_feedward,lambda_attention, trainable_lambda, N_dense, scale_norm)
     AttentiveFP = GAT(in_features, bond_features, output_features, dropout_gnn_ratio, leaky_relu_slope, elu_alpha,number_layer)
-    AttentiveFP_sd = torch.load("Molecular_Graph/Save_gnn_model/46_model_encoder_GAT.pkl", map_location=device)
-    Graph_Transformer_sd = torch.load("Molecular_Graph/Save_gnn_model/46_model_encoder_GT.pkl", map_location=device)
+    AttentiveFP_sd = torch.load("Pretrain_model/GAT_encoder.pkl", map_location=device)
+    Graph_Transformer_sd = torch.load("Pretrain_model/GT_encoder.pkl", map_location=device)
     AttentiveFP.load_state_dict(AttentiveFP_sd, strict=True)
     Graph_Transformer.load_state_dict(Graph_Transformer_sd, strict=True)
     DeBERTa_model = DeBERTa(hidden_size, vocab_size, max_position_embeddings, type_vocal_size, layer_norm_eps,
                             hidden_dropout_prob, num_hidden_layers, intermediate_size, num_attention_heads,
                             attention_probs_dropout_prob)
-    full_sd=torch.load("Molecular_Language/Save_DeBERTa_model/15_encoder.pkl",map_location=device)
+    full_sd=torch.load("Pretrain_model/DeBERTa_encoder.pkl",map_location=device)
     deberta_sd = {
         k.replace("Deberta.", ""): v
         for k, v in full_sd.items()
@@ -103,4 +103,5 @@ for seed in seed_list:
     info(f"Seed{seed}")
     Save_path_seed=os.path.join(save_path)
     mkdir(Save_path_seed)
+
     fold_score=training(log,dataset_path,text_path,dataset_type,seed,val_path,test_path,split,split_type,metric,Model,tokenizer,Save_path_seed,batch_size,init_lr,total_epochs,task_name)
