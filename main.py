@@ -4,7 +4,7 @@ from Molecular_Graph.graph_model import GT,GAT
 import numpy as np
 import random
 from Molecular_Language.language_model import DeBERTa
-from tool import mkdir,set_log
+from useful_tool import mkdir,set_log
 from transformers import AutoTokenizer
 import os
 from train import training
@@ -105,4 +105,5 @@ for seed in seed_list:
     mkdir(Save_path_seed)
 
     fold_score=training(log,dataset_path,text_path,dataset_type,seed,val_path,test_path,split,split_type,metric,Model,tokenizer,Save_path_seed,batch_size,init_lr,total_epochs,task_name)
+
 
