@@ -1,2 +1,5 @@
 # MultiModal-Contrastive-GNN
-This project is implemented in Python 3.8. All required libraries and their versions for running this code are specified in requirements.txt and environment.yml.
+This project is implemented in Python 3.8. All required libraries and their versions for running this code are specified in 'requirements.txt' and 'environment.yml'. The prompt templates used in the paper for large language model input construction are provided in 'Prompt_template.txt'. We provided the LLM-augmented textual data derived from the pretraining dataset and the ten benchmark datasets in 'Pretrain_Text_Datasets' and 'Process_Text_Datasets', respectively. If you wish to use the provided templates to augment SMILES strings into corresponding textual descriptions, you can import the target SMILES into the `process` module under `Molecular_Language`. 
+The files required for `Mistral-7B-Instruct-v0.3` and `deberta-v3-base` can be downloaded from their official websites or via the following Google Drive links:
+- Mistral-7B-Instruct-v0.3: https://drive.google.com/drive/folders/1AABdP7gH2u9vLMlbqkp-bIkmTeJl0pZC?usp=drive_link
+- DeBERTa-v3-base: https://drive.google.com/drive/folders/1KfnTP1WVnqNwhELc_qICTza5znLMzmIa?usp=drive_link
