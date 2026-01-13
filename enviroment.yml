@@ -1,0 +1,6 @@
+name: your_env_name
+channels:
+  - conda-forge
+dependencies:
+  - python=3.8
+  - rdkit=2024.03.5
