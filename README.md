@@ -10,7 +10,7 @@ The following model parameters were obtained from fine-tuning experiments with d
 - Bace：https://drive.google.com/drive/folders/1urjw3ZaRlkY1yvEyo2EfdpqxFEoTzCJp?usp=drive_link
 - BBBP：https://drive.google.com/drive/folders/1VDcvUdnogQaZrQDXiXAnWm7BrbV2fuPV?usp=drive_link
 - Clintox：https://drive.google.com/drive/folders/19KJn4wjZYfU5P--gseQP4W0LrlmhFadg?usp=drive_link
-- Tox21：
+- Tox21：https://drive.google.com/drive/folders/1TUSlu_BpAu-2iu71Ej2oL5IySRNDW3QL?usp=drive_link
 - ESOL：https://drive.google.com/drive/folders/1o9WI8OwUZJ7ydQpZAFI2oJ4zKdYfUU1C?usp=drive_link
 - FreeSolv：https://drive.google.com/drive/folders/1pTkMC3rBaGaWS26CYpZsaNCFPnkrTEnU?usp=drive_link
 - Lipophilicity：https://drive.google.com/drive/folders/1ipw-Wjr7QKiPuh0bZ5-CDH2q3dISOHeR?usp=drive_link
